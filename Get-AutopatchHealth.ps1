@@ -1,6 +1,6 @@
 ﻿<#PSScriptInfo
 
-.VERSION 2.3.1
+.VERSION 2.3.3
 
 .GUID 2c80336a-7d9b-41c0-8eb3-a80abef2dbb8
 
@@ -25,7 +25,8 @@
 .EXTERNALSCRIPTDEPENDENCIES 
 
 .RELEASENOTES
-v2.3.1 - 4.8.26 - Added HTML summary report and logging functionality
+v2.3.3 - 4.14.26 - Corrected telemetry check values; minor bug fixes
+v2.3.2 - 4.8.26 - Added HTML summary report and logging functionality. Hosted on GitHub for Get-Help -Online help.
 v2.2.0 - 4.3.26 - Added Windows Event log checks and report functionality
 v2.1.1 - 4.1.26 - Incorporated tester feedback and updated Get-Help documentation
 v2.0.1 - 3.25.26 - Removed deprecated network endpoint from connectivity checks
@@ -164,7 +165,7 @@ This script aligns with Microsoft guidance for:
 - Delivery Optimization network requirements
 
 .LINK
-https://www.powershellgallery.com/packages/Get-AutopatchHealth/2.3.1/Content/Get-AutopatchHealth.ps1
+https://github.com/jeffgilb/Get-AutopatchHealth/blob/main/Get-AutopatchHealth.ps1
 #>
 
 param (
@@ -312,12 +313,16 @@ Function Test-Telemetry {
         [int]$minRequired
     )
     $regPath = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection'
-    $valueName = 'AllowTelemetry'
+    $valueName = 'AllowTelemetry_PolicyManager'
+
+    # AllowTelemetry_PolicyManager is written by Intune telemetry policies implemented via the Policy CSP
+    # (Settings Catalog, OMA‑URI, or Device Restrictions). It represents the authoritative MDM‑enforced
+    # telemetry level and supersedes the legacy AllowTelemetry policy key.
 
     try {
         $val = (Get-ItemProperty -Path $regPath -Name $valueName -ErrorAction Stop).$valueName
         $val = [int]$val
-        $map = @{ 0 = 'Security (Optional)'; 1 = 'Basic'; 2 = 'Enhanced'; 3 = 'Required' }
+        $map = @{ 0 = 'Diagnostic data off (Security)'; 1 = 'Required diagnostic data (Basic)'; 2 = '(Legacy) Enhanced'; 3 = 'Optional diagnostic data (Full)' }
         if ($val -ge $minRequired) { Write-Host "  Telemetry is set to $($map[$val]) [$($val)]" ; return $true } 
         else { return $false }
     }
@@ -855,7 +860,7 @@ If ($Remediation){
 }
 
 if ($Report){ $transcriptFile = "$env:WINDIR\Temp\AutopatchHealth_$env:COMPUTERNAME.log" ; Start-Transcript $transcriptFile 
-            $reportFile = "$env:PUBLIC\Documents\$env:COMPUTERNAME.html" 
+            $reportFile = "$env:PUBLIC\Documents\AutopatchHealth_$env:COMPUTERNAME.html" 
             } 
 
 Clear-Host
@@ -909,7 +914,7 @@ HKLM\SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\PolicyState, and legacy WSUS 
         write-host "Checking Telemetry Settings" -ForegroundColor Yellow
         $telemetryResult = Test-Telemetry -minRequired 1 # Security(0),Required/Basic(1),Enhanced(2),Optional/Full(3)
         if ( $telemetryResult) { Write-Host "$($script:Symbols.Pass) Telemetry is >= Required/Basic [1] "-ForegroundColor Green ; $script:summary+= "$($script:Symbols.Pass) Telemetry setting at or above miniumum required level"  }
-        else{ Write-Host "$($script:Symbols.Fail) Below Required. Minimum is $minRequired" -ForegroundColor Red ; $script:exitCode++ ; $script:summary+= "$($script:Symbols.Fail) Telemetry setting below miniumum required level" }  
+        else{ Write-Host "$($script:Symbols.Fail) Telemetry set below required minimum" -ForegroundColor Red ; $script:exitCode++ ; $script:summary+= "$($script:Symbols.Fail) Telemetry setting below miniumum required level" }  
     }
     catch {
         # Do this if a terminating exception happens
@@ -982,7 +987,7 @@ try {
      if ($results.Reachable -contains $false) { Write-Host "$($script:Symbols.Fail) Some Autopatch network connectivity checks were unsuccessful" -ForegroundColor Red ; $script:exitCode++ ; $script:summary+= "$($script:Symbols.Fail) Autopatch network connectivity checks unsuccessful" }
     else{ Write-Host "$($script:Symbols.Pass) Autopatch network connectivity checks successful" -ForegroundColor Green ; $script:summary+= "$($script:Symbols.Pass) Autopatch network connectivity checks successful" }
 
-    $results | Select-Object Name, Target, Reachable | Format-Table -AutoSize
+    $results | Select-Object Name, Target, DnsResolved, Reachable | Format-Table -AutoSize
 }
 catch {
     Write-Error "An error occurred: $_"

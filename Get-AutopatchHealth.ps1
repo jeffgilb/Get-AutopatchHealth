@@ -1,6 +1,6 @@
 ﻿<#PSScriptInfo
 
-.VERSION 2.3.3
+.VERSION 2.3.4
 
 .GUID 2c80336a-7d9b-41c0-8eb3-a80abef2dbb8
 
@@ -25,6 +25,7 @@
 .EXTERNALSCRIPTDEPENDENCIES 
 
 .RELEASENOTES
+v2.3.4 - 4.14.26 - Registry check bug fixes
 v2.3.3 - 4.14.26 - Corrected telemetry check values; minor bug fixes
 v2.3.2 - 4.8.26 - Added HTML summary report and logging functionality. Hosted on GitHub for Get-Help -Online help.
 v2.2.0 - 4.3.26 - Added Windows Event log checks and report functionality
@@ -260,29 +261,37 @@ Function Check-Registry {
     # AutopatchRegistryBlockerCheck
     # -----------------------------
     $blockingKey = 0
-    # --- Paths (use Registry:: to avoid 32-bit WOW64 redirection issues) ---
-    $regChecks = @(
-    'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\DoNotConnectToWindowsUpdateInternetLocations',
-    'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\DisableWindowsUpdateAccess',
-    'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU\NoAutoUpdate'
-    )
-    foreach ($path in $regChecks) {
-    if (Test-Path $path) { Write-Host "  Autopatch device registration blocking registry key value found: $path" -ForegroundColor Red ; $blockingKey++ } 
+    $blockers = @(
+            @{
+                Path  = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
+                Name  = 'DoNotConnectToWindowsUpdateInternetLocations'
+            },
+            @{
+                Path  = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate'
+                Name  = 'DisableWindowsUpdateAccess'
+            },
+            @{
+                Path  = 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU'
+                Name  = 'NoAutoUpdate'
+            }
+        )
+    foreach ($blocker in $blockers) {
+        if (Get-ItemProperty -Path $blocker.Path -Name $blocker.Name -ErrorAction SilentlyContinue) {
+            Write-Host "  Autopatch device registration blocking registry key value found:`n   $($blocker.Path)\$($blocker.Name)" -ForegroundColor Red ; $blockingKey++ } 
     }
-    if ($blockingKey -eq 0){ Write-Host "  No Autopatch device registration blockers found" }
-
+    if ($blockingKey -eq 0){ Write-Host "  No Autopatch device registration blockers found" }        
+    
     # -----------------------------
     # WSUS Server Keys Checks
     # -----------------------------   
     $SUPreg = 0
-    # --- Paths (use Registry:: to avoid 32-bit WOW64 redirection issues) ---
     $WSrvKeys = @{ Path = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"; ValueName = "WUServer"; WSrvValue = $null },
                 @{ Path = "Registry::HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"; ValueName = "WUStatusServer"; WSrvValue = $null }
     
     foreach ($Key in $WSrvKeys) {
         $reg = Get-ItemProperty -Path $Key.Path -ErrorAction SilentlyContinue
         if ([string]::IsNullOrWhiteSpace($reg.$($Key.ValueName))) { Write-Host "  $($Key.ValueName) key value not found or blank " }
-        else { Write-Host "  $($Key.ValueName) value is configured" -ForegroundColor Red ; $SUPreg++ } # WSUS config registry value found
+        else { Write-Host "  $($Key.ValueName) value is configured: $($reg.$($Key.ValueName))" -ForegroundColor Red ; $SUPreg++ } # WSUS config registry value found
         }
     
     # The update source key values only apply if the WUServer and/or WUStatusServer values are present [1 means WSUS, 0 means Autopatch]
@@ -295,7 +304,7 @@ Function Check-Registry {
     ForEach ($Key in $UpdateSourceKeys){               
             $value = Get-ItemProperty -Path $Key.Path -Name $Key.ValueName -ErrorAction SilentlyContinue
             if ($null -ne $value){  
-                if ([string]$value.$($Key.ValueName) -eq $Key.WSUSValue){ Write-Host "  $($Key.ValueName) is set to 1 (WSUS)" -ForegroundColor Yellow ; $SUPreg++ } # WSUS config registry value found
+                if ([string]$value.$($Key.ValueName) -eq $Key.WSUSValue){ Write-Host "  $($Key.ValueName) is set to 1 (WSUS)" -ForegroundColor Red ; $SUPreg++ } # WSUS config registry value found
             } else { Write-Host "  No WSUS update source policy registry values found" }
         
     # Summary

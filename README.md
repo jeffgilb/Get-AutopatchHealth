@@ -202,9 +202,4 @@ If you find a bug or want a new check added:
     *   Enrollment/co-management context
     *   Relevant output (and attach the remediation log if available)
 
-***
-
-### Repo contents
-
-*   `[Get-AutopatchHealth.ps1](https://onedrive.live.com/?id=cc667cc8-1253-4aaf-b8b7-d464ec4ccec1&cid=15f03658bc93f824&web=1&EntityRepresentationId=175e80ad-15d7-4583-b9e6-455590a2447e)` — main script 
 

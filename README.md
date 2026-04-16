@@ -1,8 +1,8 @@
 # Get-AutopatchHealth
 
-A **read-only Windows Autopatch health assessment** PowerShell script that validates Autopatch and Feature Update readiness by performing comprehensive checks across **device configuration**, **policy authority**, **services**, **registry**, **network connectivity**, **scheduled tasks**, and **Windows Update event logs**. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0), [\[powershell...allery.com\]](https://www.powershellgallery.com/packages/Get-AutopatchHealth/2.3.4)
+A **read-only Windows Autopatch health assessment** PowerShell script that validates Autopatch and Feature Update readiness by performing comprehensive checks across **device configuration**, **policy authority**, **services**, **registry**, **network connectivity**, **scheduled tasks**, and **Windows Update event logs**.
 
-> Designed to run safely in **SYSTEM** or **user** context, and to produce console output plus an **exit code suitable for Intune detection/remediation workflows**. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+> Designed to run safely in **SYSTEM** or **user** context, and to produce console output plus an **exit code suitable for Intune detection/remediation workflows**.
 
 ***
 
@@ -10,24 +10,24 @@ A **read-only Windows Autopatch health assessment** PowerShell script that valid
 
 ### 1) General configuration health
 
-*   **OS servicing branch / release channel**: verifies the device is on a supported GA/production channel (not Insider/Preview). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   **OS servicing branch / release channel**: verifies the device is on a supported GA/production channel (not Insider/Preview).
 *   **Registry settings**: checks for Autopatch-blocking or WSUS-redirecting values under:
-    *   `HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate` (`DoNotConnectToWindowsUpdateInternetLocations`, `DisableWindowsUpdateAccess`, `WUServer`, `WUStatusServer`) [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-    *   `HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU` (`NoAutoUpdate`) [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-    *   Update source override keys (e.g., `SetPolicyDrivenUpdateSourceForDriverUpdates`, `FeatureUpdates`, `OtherUpdates`, `QualityUpdates`) that can push devices toward WSUS when combined with WSUS configuration. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   **Telemetry**: reads local policy to confirm minimum telemetry is **1 (Required/Basic)**. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   **Intune enrollment & IME activity**: validates enrollment indicators and checks IME activity/log signals within a recent window (script references last 28 days). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   **Co-management workloads (if applicable)**: confirms required workloads are owned appropriately (Windows Update policies, device configuration, Office C2R apps). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+    *   `HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate` (`DoNotConnectToWindowsUpdateInternetLocations`, `DisableWindowsUpdateAccess`, `WUServer`, `WUStatusServer`)
+    *   `HKLM\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU` (`NoAutoUpdate`)
+    *   Update source override keys (e.g., `SetPolicyDrivenUpdateSourceForDriverUpdates`, `FeatureUpdates`, `OtherUpdates`, `QualityUpdates`) that can push devices toward WSUS when combined with WSUS configuration.
+*   **Telemetry**: reads local policy to confirm minimum telemetry is **1 (Required/Basic)**. 
+*   **Intune enrollment & IME activity**: validates enrollment indicators and checks IME activity/log signals within a recent window (script references last 28 days).
+*   **Co-management workloads (if applicable)**: confirms required workloads are owned appropriately (Windows Update policies, device configuration, Office C2R apps). [\[Get-Autopa...Health.ps1
 *   **Update policy authority (source of truth)**: reads `PolicySources` from  
-    `HKLM\SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\PolicyState\PolicySources` and interprets values such as `4 = Intune/Autopatch`. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+    `HKLM\SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\PolicyState\PolicySources` and interprets values such as `4 = Intune/Autopatch`.
 
-> Note: The script explicitly comments that legacy WSUS keys under `...\Policies\Microsoft\Windows\WindowsUpdate` are only authoritative for WSUS/GPO/ConfigMgr, and that Intune/WUfB/Autopatch relies on policy state under `...\Microsoft\WindowsUpdate\UpdatePolicy\PolicyState`. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+> Note: The script explicitly comments that legacy WSUS keys under `...\Policies\Microsoft\Windows\WindowsUpdate` are only authoritative for WSUS/GPO/ConfigMgr, and that Intune/WUfB/Autopatch relies on policy state under `...\Microsoft\WindowsUpdate\UpdatePolicy\PolicyState`.
 
 ### 2) Autopatch service health
 
 Validates Windows Update–related services such as:
 
-*   `BITS`, `CryptSvc`, `DiagTrack`, `DoSvc`, `UsoSvc`, `WaaSMedicSvc`, `wuauserv` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   `BITS`, `CryptSvc`, `DiagTrack`, `DoSvc`, `UsoSvc`, `WaaSMedicSvc`, `wuauserv`
 
 ### 3) Network endpoint connectivity
 
@@ -36,8 +36,8 @@ Confirms reachability of Microsoft/Autopatch endpoints including:
 *   `mmdcustomer.microsoft.com`, `mmdls.microsoft.com`, `login.windows.net`,  
     `device.autopatch.microsoft.com`, `services.autopatch.microsoft.com`,  
     `devicelistenerprod.microsoft.com`
-*   EU boundary variant: `devicelistenprod.eudb.microsoft.com` (EU tenants) [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0), [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/windows/deployment/windows-autopatch/prepare/windows-autopatch-configure-network)
-*   Payload storage: `payloadprod*.blob.core.windows.net` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0), [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/windows/deployment/windows-autopatch/prepare/windows-autopatch-configure-network)
+*   EU boundary variant: `devicelistenprod.eudb.microsoft.com` (EU tenants)
+*   Payload storage: `payloadprod*.blob.core.windows.net`
 
 Microsoft’s published Autopatch network allowlist documentation aligns with the endpoint set this script tests. [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/windows/deployment/windows-autopatch/prepare/windows-autopatch-configure-network)
 
@@ -46,8 +46,7 @@ Microsoft’s published Autopatch network allowlist documentation aligns with th
 Validates required scheduled tasks, including:
 
 *   `\Microsoft\Windows\WindowsUpdate\Scheduled Start`
-*   `\Microsoft\Windows\UpdateOrchestrator\Report policies` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-
+*   `\Microsoft\Windows\UpdateOrchestrator\Report policies`
 ### 5) Windows Update event log checks
 
 Scans for known update-related issues within the last **7 days** (configurable via `$DaysBack`) across:
@@ -55,15 +54,14 @@ Scans for known update-related issues within the last **7 days** (configurable v
 *   `Microsoft-Windows-WindowsUpdateClient/Operational`
 *   `Microsoft-Windows-WindowsUpdateClient/Admin`
 *   `Microsoft-Windows-UpdateOrchestrator/Operational`
-*   `Microsoft-Windows-DeliveryOptimization/Operational` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-
+*   `Microsoft-Windows-DeliveryOptimization/Operational`
 ***
 
 ## Requirements
 
-*   Windows PowerShell (script relaunches itself in **64-bit PowerShell** when invoked from a 32-bit process on x64 systems). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   Recommended: run **elevated** (some checks may return false negatives without admin rights; the script explicitly warns about this). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   No external PowerShell modules required (script is self-contained). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   Windows PowerShell (script relaunches itself in **64-bit PowerShell** when invoked from a 32-bit process on x64 systems).
+*   Recommended: run **elevated** (some checks may return false negatives without admin rights; the script explicitly warns about this).
+*   No external PowerShell modules required (script is self-contained).
 
 ***
 
@@ -75,7 +73,7 @@ Clone the repo and run:
 .\Get-AutopatchHealth.ps1
 ```
 
-This prints results to the console and returns an exit code that you can use in automation. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+This prints results to the console and returns an exit code that you can use in automation.
 
 ***
 
@@ -83,7 +81,7 @@ This prints results to the console and returns an exit code that you can use in 
 
 ### `-Remediation`
 
-Use this to **test the script’s behavior as an Intune remediation** (detection-only mode output formatting and logging behavior). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+Use this to **test the script’s behavior as an Intune remediation** (detection-only mode output formatting and logging behavior).
 
 ```powershell
 .\Get-AutopatchHealth.ps1 -Remediation
@@ -92,19 +90,19 @@ Use this to **test the script’s behavior as an Intune remediation** (detection
 **Remediation mode logging:**
 
 *   Writes transcript to:  
-    `C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\IR_AutopatchHealth.log` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+    `C:\ProgramData\Microsoft\IntuneManagementExtension\Logs\IR_AutopatchHealth.log`
 *   If failures are detected, the transcript is retained/renamed as:  
-    `IR_AutopatchHealth_ERR.log` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   If later runs succeed, the ERR log is cleaned up after **14 days**. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+    `IR_AutopatchHealth_ERR.log`
+*   If later runs succeed, the ERR log is cleaned up after **14 days**.
 
 **Why output formatting changes in Remediation mode:**  
-The script contains a helper that avoids Unicode symbols because they may not render in the Intune admin center remediation output. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+The script contains a helper that avoids Unicode symbols because they may not render in the Intune admin center remediation output.
 
 > Microsoft’s remediation guidance also notes script/output considerations (e.g., encoding in UTF‑8). [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/remediations)
 
 ### `-EU`
 
-Includes EU Data Boundary endpoints during network checks. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0), [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/windows/deployment/windows-autopatch/prepare/windows-autopatch-configure-network)
+Includes EU Data Boundary endpoints during network checks.[\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/windows/deployment/windows-autopatch/prepare/windows-autopatch-configure-network)
 
 ```powershell
 .\Get-AutopatchHealth.ps1 -EU
@@ -112,7 +110,7 @@ Includes EU Data Boundary endpoints during network checks. [\[Get-Autopa...Healt
 
 ### `-Report`
 
-Creates a transcript and generates an **HTML report** at the end of execution, then opens it in the default browser. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+Creates a transcript and generates an **HTML report** at the end of execution, then opens it in the default browser.
 
 ```powershell
 .\Get-AutopatchHealth.ps1 -Report
@@ -120,8 +118,8 @@ Creates a transcript and generates an **HTML report** at the end of execution, t
 
 Report artifacts:
 
-*   Transcript: `%WINDIR%\Temp\AutopatchHealth_<COMPUTERNAME>.log` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   HTML report: `C:\Users\Public\Documents\AutopatchHealth_<COMPUTERNAME>.html` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   Transcript: `%WINDIR%\Temp\AutopatchHealth_<COMPUTERNAME>.log`
+*   HTML report: `C:\Users\Public\Documents\AutopatchHealth_<COMPUTERNAME>.html`
 
 ***
 
@@ -131,7 +129,7 @@ Inside the script there is a **READ ME section** showing how to hard-code flags 
 
 *   `$Remediation = $true`
 *   `$EU = $true`
-*   `$Report = $true` [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   `$Report = $true` 
 
 This is useful when packaging the script into platforms where passing parameters is inconvenient.
 
@@ -139,8 +137,8 @@ This is useful when packaging the script into platforms where passing parameters
 
 ## Exit codes (Intune-friendly)
 
-*   **Exit `0`**: Healthy / no failures detected. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   **Exit `1`**: One or more failures detected (Remediation mode uses this to indicate remediation is needed). [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   **Exit `0`**: Healthy / no failures detected. 
+*   **Exit `1`**: One or more failures detected (Remediation mode uses this to indicate remediation is needed).
 
 ***
 
@@ -148,8 +146,8 @@ This is useful when packaging the script into platforms where passing parameters
 
 This script is designed to behave well as an Intune remediation detection script:
 
-*   Run it in detection-only mode with `-Remediation` for Admin Center friendly output. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   Leverage the exit code for compliance reporting. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0), [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/remediations)
+*   Run it in detection-only mode with `-Remediation` for Admin Center friendly output.
+*   Leverage the exit code for compliance reporting. [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/remediations)
 
 > Tip: Keep scripts encoded in UTF‑8 as recommended in Microsoft’s remediation documentation. [\[learn.microsoft.com\]](https://learn.microsoft.com/en-us/intune/intune-service/fundamentals/remediations)
 
@@ -167,9 +165,9 @@ If devices fail the network connectivity checks, confirm your proxy/firewall all
 
 The script embeds release notes in the header. Recent highlights include:
 
-*   v2.3.2: added HTML summary report and logging functionality. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   v2.2.0: added Windows Update event log checks and reporting. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
-*   v2.0.0+: expanded checks and documentation; removed deprecated endpoints. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+*   v2.3.2: added HTML summary report and logging functionality.
+*   v2.2.0: added Windows Update event log checks and reporting.
+*   v2.0.0+: expanded checks and documentation; removed deprecated endpoints.
 
 ***
 
@@ -191,7 +189,7 @@ If you add new checks, please include:
 
 ## Disclaimer
 
-This script is intended for **read-only health validation** and troubleshooting support. Always validate changes in a test ring before applying policy or registry modifications broadly. [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+This script is intended for **read-only health validation** and troubleshooting support. Always validate changes in a test ring before applying policy or registry modifications broadly.
 
 ***
 
@@ -202,14 +200,11 @@ If you find a bug or want a new check added:
 *   Open an issue with:
     *   Windows version/build
     *   Enrollment/co-management context
-    *   Relevant output (and attach the remediation log if available) [\[Get-Autopa...Health.ps1 \| Txt\]](https://onedrive.live.com?cid=15F03658BC93F824&id=15F03658BC93F824!s6df83d2763c5463f9560ceabc13e9de0)
+    *   Relevant output (and attach the remediation log if available)
 
 ***
 
 ### Repo contents
 
-*   `[Get-AutopatchHealth.ps1](https://onedrive.live.com/?id=cc667cc8-1253-4aaf-b8b7-d464ec4ccec1&cid=15f03658bc93f824&web=1&EntityRepresentationId=175e80ad-15d7-4583-b9e6-455590a2447e)` — main script [\[onedrive.live.com\]](https://onedrive.live.com/?id=cc667cc8-1253-4aaf-b8b7-d464ec4ccec1&cid=15f03658bc93f824&web=1)
+*   `[Get-AutopatchHealth.ps1](https://onedrive.live.com/?id=cc667cc8-1253-4aaf-b8b7-d464ec4ccec1&cid=15f03658bc93f824&web=1&EntityRepresentationId=175e80ad-15d7-4583-b9e6-455590a2447e)` — main script 
 
-***
-
-If you want, I can also generate a **GitLab-friendly `CHANGELOG.md`** from the embedded release notes and a **minimal `.gitlab-ci.yml`** lint job for PowerShell style/static checks—but the README above should be a strong, polished default.

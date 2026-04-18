@@ -17,7 +17,7 @@ A **read-only Windows Autopatch health assessment** PowerShell script that valid
     *   Update source override keys (e.g., `SetPolicyDrivenUpdateSourceForDriverUpdates`, `FeatureUpdates`, `OtherUpdates`, `QualityUpdates`) that can push devices toward WSUS when combined with WSUS configuration.
 *   **Telemetry**: reads local policy to confirm minimum telemetry is **1 (Required/Basic)**. 
 *   **Intune enrollment & IME activity**: validates enrollment indicators and checks IME activity/log signals within a recent window (script references last 28 days).
-*   **Co-management workloads (if applicable)**: confirms required workloads are owned appropriately (Windows Update policies, device configuration, Office C2R apps). [\[Get-Autopa...Health.ps1
+*   **Co-management workloads (if applicable)**: confirms required workloads are owned appropriately (Windows Update policies, device configuration, Office C2R apps).
 *   **Update policy authority (source of truth)**: reads `PolicySources` from  
     `HKLM\SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\PolicyState\PolicySources` and interprets values such as `4 = Intune/Autopatch`.
 
